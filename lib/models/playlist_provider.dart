@@ -13,7 +13,7 @@ class PlaylistProvider extends ChangeNotifier {
       audioPath: 'audio/fragility.mp3'
     ),
     Song(
-      songName: 'Wild Peaks 2',
+      songName: 'Wild Peaks',
       artistName: 'Tiko Tiko',
       albumArtImagePath: 'assets/images/album_cover_2.jpg',
       audioPath: 'audio/wild_peaks.mp3'
@@ -67,12 +67,13 @@ class PlaylistProvider extends ChangeNotifier {
   
   Future<void> resume() async {
     await _audioPlayer.resume();
-    _isPlaying = false;
+    _isPlaying = true;
     notifyListeners();
   }
 
   Future<void> pauseOrResume() async {
     _isPlaying ? pause() : resume();
+    notifyListeners();
   }
 
   Future<void> seek(Duration position) async {

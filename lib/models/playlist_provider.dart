@@ -7,22 +7,22 @@ class PlaylistProvider extends ChangeNotifier {
 
   final List<Song> _playlist = [
     Song(
-      songName: 'Wild Peaks',
-      artistName: 'Artist 1',
-      albumArtImagePath: 'assets/images/album.jpg',
-      audioPath: 'assets/audio/wild_peaks.mp3'
+      songName: 'Fragility',
+      artistName: 'Romeo',
+      albumArtImagePath: 'assets/images/album_cover.jpg',
+      audioPath: 'audio/fragility.mp3'
     ),
     Song(
       songName: 'Wild Peaks 2',
-      artistName: 'Artist 2',
-      albumArtImagePath: 'assets/images/album.jpg',
-      audioPath: 'assets/audio/wild_peaks.mp3'
+      artistName: 'Tiko Tiko',
+      albumArtImagePath: 'assets/images/album_cover_2.jpg',
+      audioPath: 'audio/wild_peaks.mp3'
     ),
     Song(
-      songName: 'Wild Peaks 3',
-      artistName: 'Artist 3',
-      albumArtImagePath: 'assets/images/album.jpg',
-      audioPath: 'assets/audio/wild_peaks.mp3'
+      songName: 'Game Over',
+      artistName: '2050',
+      albumArtImagePath: 'assets/images/album_cover_3.jpg',
+      audioPath: 'audio/game_over.mp3'
     ),
   ];
 
@@ -31,9 +31,96 @@ class PlaylistProvider extends ChangeNotifier {
   
   set currentSongIndex(int? newIndex) {
     _currentSongIndex = newIndex;
+
+    if (newIndex != null) {
+      play(); //Play the song at the new index
+    }
+
     notifyListeners();
   }
 
   /* AUDIO PLAYER */
   final AudioPlayer _audioPlayer = AudioPlayer();
+
+  Duration _currentDuration = Duration.zero;
+  Duration _totalDuration = Duration.zero;
+  
+  Duration get currentDuration => _currentDuration;
+  Duration get totalDuration => _totalDuration;
+  
+  bool _isPlaying = false;
+  bool get isPlaying => _isPlaying;
+
+  Future<void> play() async {
+    final String path = _playlist[_currentSongIndex!].audioPath;
+    await _audioPlayer.stop(); // Stop current song
+    await _audioPlayer.play(AssetSource(path));
+    _isPlaying = true;
+    notifyListeners();
+  }
+
+  Future<void> pause() async {
+    await _audioPlayer.pause();
+    _isPlaying = false;
+    notifyListeners();
+  }
+  
+  Future<void> resume() async {
+    await _audioPlayer.resume();
+    _isPlaying = false;
+    notifyListeners();
+  }
+
+  Future<void> pauseOrResume() async {
+    _isPlaying ? pause() : resume();
+  }
+
+  Future<void> seek(Duration position) async {
+    await _audioPlayer.seek(position);
+  }
+
+  void playNextSong() {
+    if (_currentSongIndex != null) {
+      if (_currentSongIndex! < _playlist.length-1) {
+        currentSongIndex = _currentSongIndex! + 1;
+      } else {
+        currentSongIndex = 0;  // Loop back to the first song
+      }
+    }
+  }
+
+  void playPreviousSong() {
+    if (_currentDuration.inSeconds > 2) { //If more than 2 seconds have passed, restart the current song
+      seek(Duration.zero);
+    } else {
+      if (_currentSongIndex! > 0) {
+        currentSongIndex = _currentSongIndex! - 1; //
+      } else {
+        currentSongIndex = _playlist.length - 1; //If it's the first, play the last song
+      }
+    }
+  }
+
+  PlaylistProvider() {
+    listenToDuration();
+  }
+  
+  void listenToDuration() {
+    _audioPlayer.onDurationChanged.listen((newDuration) {
+      _totalDuration = newDuration;
+      notifyListeners();
+    });
+
+    //Current duration
+    _audioPlayer.onPositionChanged.listen((newPosition) {
+      _currentDuration = newPosition;
+      notifyListeners();
+    });
+
+    // Listen for song completion
+    _audioPlayer.onPlayerComplete.listen((event) {
+
+    });
+  }
+
 }

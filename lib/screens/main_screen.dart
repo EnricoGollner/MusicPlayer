@@ -31,6 +31,7 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
+        centerTitle: true,
         title: const Text('P L A Y L I S T'),
       ),
       drawer: const CustomDrawer(),

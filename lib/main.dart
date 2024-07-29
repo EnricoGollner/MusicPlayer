@@ -11,7 +11,7 @@ void main() {
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => PlaylistProvider()),
       ],
-      child: const MainScreen(),
+      child: const MainApp(),
     ),
   );
 }

@@ -25,6 +25,7 @@ class NeuBox extends StatelessWidget {
           ),
         ]
       ),
+      child: child,
     );
   }
 }

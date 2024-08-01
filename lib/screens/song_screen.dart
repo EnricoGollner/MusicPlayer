@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:music_player/models/playlist_provider.dart';
+import 'package:music_player/models/song.dart';
 import 'package:music_player/widgets/custom_box.dart';
 import 'package:provider/provider.dart';
 
@@ -14,20 +15,41 @@ class SongScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<PlaylistProvider>(
-      builder: (context, value, child) {
-        final playlist = value.playlist1;
-        final currentSong = playlist[value.currentSongIndex ?? 0];
+      builder: (context, playlistProvider, child) {
+        final Song currentSong = playlistProvider.selectedPlaylist!.songs[playlistProvider.currentSongIndex ?? 0];
 
         return Scaffold(
           backgroundColor: Theme.of(context).colorScheme.surface,
+          appBar: AppBar(
+            centerTitle: true,
+            title: const Text(
+              'S O N G',
+              style: TextStyle(fontSize: 19),
+            ),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (context) => ListTile(
+                      leading: Image.asset(currentSong.albumArtImagePath),
+                      title: Text(currentSong.songName),
+                      subtitle: Text(currentSong.artistName),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.menu),
+              )
+            ],
+          ),
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.only(left: 25, right: 25, bottom: 25),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildHeader(context),
-                  const SizedBox(height: 25),
+                  // _buildHeader(context),
+                  // const SizedBox(height: 25),
                   CustomBox(
                     child: Column(
                       children: [
@@ -69,10 +91,10 @@ class SongScreen extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(_formatTime(value.currentDuration)),
+                        Text(_formatTime(playlistProvider.currentDuration)),
                         const Icon(Icons.shuffle),
                         const Icon(Icons.repeat),
-                        Text(_formatTime(value.totalDuration)),
+                        Text(_formatTime(playlistProvider.totalDuration)),
                       ],
                     ),
                   ),
@@ -83,8 +105,8 @@ class SongScreen extends StatelessWidget {
                     ),
                     child: Slider(
                       min: 0,
-                      max: value.totalDuration.inSeconds.toDouble(),
-                      value: value.currentDuration.inSeconds.toDouble(),
+                      max: playlistProvider.totalDuration.inSeconds.toDouble(),
+                      value: playlistProvider.currentDuration.inSeconds.toDouble(),
                       inactiveColor: Theme.of(context).colorScheme.primary.withOpacity(0.3),
                       activeColor: Colors.green,
                       onChanged: (position) {
@@ -92,7 +114,7 @@ class SongScreen extends StatelessWidget {
                       },
                       onChangeEnd: (position) {
                         //Sliding has finished
-                        value.seek(Duration(seconds: position.toInt()));
+                        playlistProvider.seek(Duration(seconds: position.toInt()));
                       },
                     ),
                   ),
@@ -101,7 +123,7 @@ class SongScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: GestureDetector(
-                          onTap: value.playPreviousSong,
+                          onTap: playlistProvider.playPreviousSong,
                           child: const CustomBox(
                             child: Icon(Icons.skip_previous),
                           ),
@@ -111,16 +133,16 @@ class SongScreen extends StatelessWidget {
                       Expanded(
                         flex: 2,
                         child: GestureDetector(
-                          onTap: value.pauseOrResume,
+                          onTap: playlistProvider.pauseOrResume,
                           child:  CustomBox(
-                            child: Icon(value.isPlaying ? Icons.pause : Icons.play_arrow),
+                            child: Icon(playlistProvider.isPlaying ? Icons.pause : Icons.play_arrow),
                           ),
                         ),
                       ),
                       const SizedBox(width: 20),
                       Expanded(
                         child: GestureDetector(
-                          onTap: value.playNextSong,
+                          onTap: playlistProvider.playNextSong,
                           child: const CustomBox(
                             child: Icon(Icons.skip_next),
                           ),
@@ -137,20 +159,20 @@ class SongScreen extends StatelessWidget {
     );
   }
 
-  Row _buildHeader(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back),
-        ),
-        const Text('P L A Y L I S T'),
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.menu),
-        )
-      ],
-    );
-  }
+  // Row _buildHeader(BuildContext context) {
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.spaceAround,
+  //     children: [
+  //       IconButton(
+  //         onPressed: () => Navigator.pop(context),
+  //         icon: const Icon(Icons.arrow_back),
+  //       ),
+  //       const Text('S O N G'),
+  //       IconButton(
+  //         onPressed: () {},
+  //         icon: const Icon(Icons.menu),
+  //       )
+  //     ],
+  //   );
+  // }
 }

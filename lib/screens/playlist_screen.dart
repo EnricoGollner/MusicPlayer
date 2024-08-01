@@ -44,11 +44,52 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
             itemCount: playlist.songs.length,
             itemBuilder: (context, index) {
                 final Song song = playlist.songs[index];
-                return ListTile(
-                  title: Text(song.songName),
-                  subtitle: Text(song.artistName),
-                  leading: Image.asset(song.albumArtImagePath),
-                  onTap: () => _goToSong(index),
+                return Dismissible(
+                  key: ValueKey(song.id),
+                  direction: DismissDirection.endToStart,
+                  confirmDismiss: (direction) async {
+                    return await showDialog<bool>(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('Remover Música'),
+                          content: const Text('Você tem certeza que deseja remover esta música da Playlist?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('Cancelar'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: Text(
+                                'Remover',
+                                style: TextStyle( color: Theme.of(context).colorScheme.error),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  onDismissed: (_) => playlistProvider.removeSongFromPlaylist(song.id),
+                  background: ColoredBox(
+                    color: Theme.of(context).colorScheme.error,
+                    child: Container(
+                      padding: const EdgeInsets.only(right: 20),
+                      alignment: Alignment.centerRight,
+                      child: const Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  child: ListTile(
+                    leading: Image.asset(song.albumArtImagePath),
+                    title: Text(song.songName),
+                    subtitle: Text(song.artistName),
+                    onTap: () => _goToSong(index),
+                    trailing: const Icon(Icons.play_arrow),
+                  ),
                 );
               },
             );

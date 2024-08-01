@@ -21,7 +21,7 @@ class CustomPlaylistCard extends StatelessWidget {
               child: cover,
             ),
             const SizedBox(width: 10),
-            Expanded(child: Text(title)),
+            Expanded(child: Text(title, style: const TextStyle(fontSize: 15),)),
             const Icon(Icons.chevron_right),
           ],
         ),

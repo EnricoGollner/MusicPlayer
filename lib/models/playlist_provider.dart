@@ -15,24 +15,28 @@ class PlaylistProvider extends ChangeNotifier {
       title: 'Artlist.io musics',
       songs: [
         Song(
+          id: 1,
           songName: 'Fragility',
           artistName: 'Romeo',
           albumArtImagePath: 'assets/images/album_cover.jpg',
           audioPath: 'audio/fragility.mp3'
         ),
         Song(
+          id: 2,
           songName: 'Wild Peaks',
           artistName: 'Tiko Tiko',
           albumArtImagePath: 'assets/images/album_cover_2.jpg',
           audioPath: 'audio/wild_peaks.mp3'
         ),
         Song(
+          id: 3,
           songName: 'Game Over',
           artistName: '2050',
           albumArtImagePath: 'assets/images/album_cover_3.jpg',
           audioPath: 'audio/game_over.mp3'
         ),
         Song(
+          id: 4,
           songName: 'Wild Peaks',
           artistName: 'Tiko Tiko',
           albumArtImagePath: 'assets/images/album_cover_2.jpg',
@@ -44,30 +48,38 @@ class PlaylistProvider extends ChangeNotifier {
 
   List<Playlist> get playlists => _playlists;
 
+  void removeSongFromPlaylist(int id) {
+    _selectedPlaylist!.songs.removeWhere((song) => song.id == id);
+    notifyListeners();
+  }
+
 
   /*  SONGS  */
-  final List<Song> _playlist1 = [
-    Song(
-      songName: 'Fragility',
-      artistName: 'Romeo',
-      albumArtImagePath: 'assets/images/album_cover.jpg',
-      audioPath: 'audio/fragility.mp3'
-    ),
-    Song(
-      songName: 'Wild Peaks',
-      artistName: 'Tiko Tiko',
-      albumArtImagePath: 'assets/images/album_cover_2.jpg',
-      audioPath: 'audio/wild_peaks.mp3'
-    ),
-    Song(
-      songName: 'Game Over',
-      artistName: '2050',
-      albumArtImagePath: 'assets/images/album_cover_3.jpg',
-      audioPath: 'audio/game_over.mp3'
-    ),
-  ];
+  // final List<Song> _playlist1 = [
+  //   Song(
+  //     id: 1,
+  //     songName: 'Fragility',
+  //     artistName: 'Romeo',
+  //     albumArtImagePath: 'assets/images/album_cover.jpg',
+  //     audioPath: 'audio/fragility.mp3'
+  //   ),
+  //   Song(
+  //     id: 2,
+  //     songName: 'Wild Peaks',
+  //     artistName: 'Tiko Tiko',
+  //     albumArtImagePath: 'assets/images/album_cover_2.jpg',
+  //     audioPath: 'audio/wild_peaks.mp3'
+  //   ),
+  //   Song(
+  //     id: 3,
+  //     songName: 'Game Over',
+  //     artistName: '2050',
+  //     albumArtImagePath: 'assets/images/album_cover_3.jpg',
+  //     audioPath: 'audio/game_over.mp3'
+  //   ),
+  // ];
 
-  List<Song> get playlist1 => _playlist1;
+  // List<Song> get playlist1 => _playlist1;
 
   int? _currentSongIndex;
   int? get currentSongIndex => _currentSongIndex;
@@ -94,7 +106,7 @@ class PlaylistProvider extends ChangeNotifier {
   bool get isPlaying => _isPlaying;
 
   Future<void> play() async {
-    final String path = _playlist1[_currentSongIndex!].audioPath;
+    final String path = _selectedPlaylist!.songs[_currentSongIndex!].audioPath;
     await _audioPlayer.stop(); // Stop current song
     await _audioPlayer.play(AssetSource(path));
     _isPlaying = true;
@@ -124,7 +136,7 @@ class PlaylistProvider extends ChangeNotifier {
 
   void playNextSong() {
     if (_currentSongIndex != null) {
-      if (_currentSongIndex! < _playlist1.length-1) {
+      if (_currentSongIndex! < _selectedPlaylist!.songs.length-1) {
         currentSongIndex = _currentSongIndex! + 1;
       } else {
         currentSongIndex = 0;  // Loop back to the first song
@@ -139,7 +151,7 @@ class PlaylistProvider extends ChangeNotifier {
       if (_currentSongIndex! > 0) {
         currentSongIndex = _currentSongIndex! - 1; //
       } else {
-        currentSongIndex = _playlist1.length - 1; //If it's the first, play the last song
+        currentSongIndex = _selectedPlaylist!.songs.length - 1; //If it's the first, play the last song
       }
     }
   }

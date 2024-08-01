@@ -16,31 +16,35 @@ class PlaylistProvider extends ChangeNotifier {
       songs: [
         Song(
           id: 1,
-          songName: 'Fragility',
-          artistName: 'Romeo',
-          albumArtImagePath: 'assets/images/album_cover.jpg',
-          audioPath: 'audio/fragility.mp3'
+          title: 'Fragility',
+          artist: 'Romeo',
+          albumCoverImagePath: 'assets/images/album_cover.jpg',
+          audioPath: 'audio/fragility.mp3',
+          fromAppAssets: true,
         ),
         Song(
           id: 2,
-          songName: 'Wild Peaks',
-          artistName: 'Tiko Tiko',
-          albumArtImagePath: 'assets/images/album_cover_2.jpg',
-          audioPath: 'audio/wild_peaks.mp3'
+          title: 'Wild Peaks',
+          artist: 'Tiko Tiko',
+          albumCoverImagePath: 'assets/images/album_cover_2.jpg',
+          audioPath: 'audio/wild_peaks.mp3',
+          fromAppAssets: true,
         ),
         Song(
           id: 3,
-          songName: 'Game Over',
-          artistName: '2050',
-          albumArtImagePath: 'assets/images/album_cover_3.jpg',
-          audioPath: 'audio/game_over.mp3'
+          title: 'Game Over',
+          artist: '2050',
+          albumCoverImagePath: 'assets/images/album_cover_3.jpg',
+          audioPath: 'audio/game_over.mp3',
+          fromAppAssets: true,
         ),
         Song(
           id: 4,
-          songName: 'Wild Peaks',
-          artistName: 'Tiko Tiko',
-          albumArtImagePath: 'assets/images/album_cover_2.jpg',
-          audioPath: 'audio/wild_peaks.mp3'
+          title: 'Wild Peaks',
+          artist: 'Tiko Tiko',
+          albumCoverImagePath: 'assets/images/album_cover_2.jpg',
+          audioPath: 'audio/wild_peaks.mp3',
+          fromAppAssets: true,
         ),
       ],
     ),
@@ -53,42 +57,32 @@ class PlaylistProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void createPlaylist(String title) {
+    final Playlist newPlaylist = Playlist(
+      id: playlists.length,
+      title: title,
+      songs: [],
+    );
+    playlists.add(newPlaylist);
+    notifyListeners();
+  }
+
+  void addSongsToPlaylist(int playlistId, List<Song> newSongs) {
+    for (Playlist playlist in _playlists) {
+      if (playlist.id == playlistId) {
+        playlist.songs.addAll(newSongs);
+      }
+    }
+    notifyListeners();
+  }
 
   /*  SONGS  */
-  // final List<Song> _playlist1 = [
-  //   Song(
-  //     id: 1,
-  //     songName: 'Fragility',
-  //     artistName: 'Romeo',
-  //     albumArtImagePath: 'assets/images/album_cover.jpg',
-  //     audioPath: 'audio/fragility.mp3'
-  //   ),
-  //   Song(
-  //     id: 2,
-  //     songName: 'Wild Peaks',
-  //     artistName: 'Tiko Tiko',
-  //     albumArtImagePath: 'assets/images/album_cover_2.jpg',
-  //     audioPath: 'audio/wild_peaks.mp3'
-  //   ),
-  //   Song(
-  //     id: 3,
-  //     songName: 'Game Over',
-  //     artistName: '2050',
-  //     albumArtImagePath: 'assets/images/album_cover_3.jpg',
-  //     audioPath: 'audio/game_over.mp3'
-  //   ),
-  // ];
-
-  // List<Song> get playlist1 => _playlist1;
-
   int? _currentSongIndex;
   int? get currentSongIndex => _currentSongIndex;
   set currentSongIndex(int? newIndex) {
     _currentSongIndex = newIndex;
 
-    if (newIndex != null) {
-      play(); //Play the song at the new index
-    }
+    if (newIndex != null) play(); //Play the song at the new index
 
     notifyListeners();
   }
@@ -106,9 +100,10 @@ class PlaylistProvider extends ChangeNotifier {
   bool get isPlaying => _isPlaying;
 
   Future<void> play() async {
-    final String path = _selectedPlaylist!.songs[_currentSongIndex!].audioPath;
+    final Song song = _selectedPlaylist!.songs[_currentSongIndex!];
+
     await _audioPlayer.stop(); // Stop current song
-    await _audioPlayer.play(AssetSource(path));
+    await _audioPlayer.play(song.fromAppAssets ? AssetSource(song.audioPath) : DeviceFileSource(song.audioPath));
     _isPlaying = true;
     notifyListeners();
   }

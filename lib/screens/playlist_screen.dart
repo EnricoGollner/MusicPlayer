@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:music_player/models/playlist.dart';
 import 'package:music_player/models/playlist_provider.dart';
@@ -41,9 +44,17 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
           final Playlist playlist = playlistProvider.selectedPlaylist!;
 
           return ListView.builder(
-            itemCount: playlist.songs.length,
+            itemCount: playlist.songs.length + 1,
             itemBuilder: (context, index) {
-                final Song song = playlist.songs[index];
+              if (index == playlist.songs.length) {
+                return ListTile(
+                  onTap: () async => await _addNewSong(playlist),
+                  leading: const Icon(Icons.add),
+                  title: const Text('Adiconar nova música'),
+                );
+              }
+          
+              final Song song = playlist.songs[index];
                 return Dismissible(
                   key: ValueKey(song.id),
                   direction: DismissDirection.endToStart,
@@ -84,9 +95,9 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                     ),
                   ),
                   child: ListTile(
-                    leading: Image.asset(song.albumArtImagePath),
-                    title: Text(song.songName),
-                    subtitle: Text(song.artistName),
+                    leading: Image.asset(song.albumCoverImagePath),
+                    title: Text(song.title),
+                    subtitle: Text(song.artist),
                     onTap: () => _goToSong(index),
                     trailing: const Icon(Icons.play_arrow),
                   ),
@@ -96,5 +107,28 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
         },
       )
     );
+  }
+
+  Future<void> _addNewSong(Playlist playlist) async {
+    FilePickerResult? songsFiles = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['mp3', 'wav'],
+      allowMultiple: true,
+    );
+
+    if (songsFiles != null) {
+      final List<Song> songs = songsFiles.paths.map((path) => File(path!)).toList().map((songFile) {
+        final Song newSong = Song(
+          id: playlist.songs.length,
+          title: songFile.path.split('/').last,
+          artist: 'Artista Desconhecido',
+          albumCoverImagePath: 'assets/images/song_cover.png',
+          audioPath: songFile.path,
+        );
+        return newSong;
+      }).toList();
+
+      playlistProvider.addSongsToPlaylist(playlist.id, songs);
+    }
   }
 }

@@ -1,11 +1,52 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:music_player/models/playlist.dart';
 import 'package:music_player/models/song.dart';
 
 class PlaylistProvider extends ChangeNotifier {
-  int? _currentSongIndex;
+  Playlist? _selectedPlaylist;
+  Playlist? get selectedPlaylist => _selectedPlaylist;
 
-  final List<Song> _playlist = [
+  void selectPlaylist(Playlist playlist) => _selectedPlaylist = playlist;
+
+  final List<Playlist> _playlists = [
+    Playlist(
+      id: 1,
+      title: 'Artlist.io musics',
+      songs: [
+        Song(
+          songName: 'Fragility',
+          artistName: 'Romeo',
+          albumArtImagePath: 'assets/images/album_cover.jpg',
+          audioPath: 'audio/fragility.mp3'
+        ),
+        Song(
+          songName: 'Wild Peaks',
+          artistName: 'Tiko Tiko',
+          albumArtImagePath: 'assets/images/album_cover_2.jpg',
+          audioPath: 'audio/wild_peaks.mp3'
+        ),
+        Song(
+          songName: 'Game Over',
+          artistName: '2050',
+          albumArtImagePath: 'assets/images/album_cover_3.jpg',
+          audioPath: 'audio/game_over.mp3'
+        ),
+        Song(
+          songName: 'Wild Peaks',
+          artistName: 'Tiko Tiko',
+          albumArtImagePath: 'assets/images/album_cover_2.jpg',
+          audioPath: 'audio/wild_peaks.mp3'
+        ),
+      ],
+    ),
+  ];
+
+  List<Playlist> get playlists => _playlists;
+
+
+  /*  SONGS  */
+  final List<Song> _playlist1 = [
     Song(
       songName: 'Fragility',
       artistName: 'Romeo',
@@ -26,9 +67,10 @@ class PlaylistProvider extends ChangeNotifier {
     ),
   ];
 
-  List<Song> get playlist => _playlist;
+  List<Song> get playlist1 => _playlist1;
+
+  int? _currentSongIndex;
   int? get currentSongIndex => _currentSongIndex;
-  
   set currentSongIndex(int? newIndex) {
     _currentSongIndex = newIndex;
 
@@ -52,7 +94,7 @@ class PlaylistProvider extends ChangeNotifier {
   bool get isPlaying => _isPlaying;
 
   Future<void> play() async {
-    final String path = _playlist[_currentSongIndex!].audioPath;
+    final String path = _playlist1[_currentSongIndex!].audioPath;
     await _audioPlayer.stop(); // Stop current song
     await _audioPlayer.play(AssetSource(path));
     _isPlaying = true;
@@ -82,7 +124,7 @@ class PlaylistProvider extends ChangeNotifier {
 
   void playNextSong() {
     if (_currentSongIndex != null) {
-      if (_currentSongIndex! < _playlist.length-1) {
+      if (_currentSongIndex! < _playlist1.length-1) {
         currentSongIndex = _currentSongIndex! + 1;
       } else {
         currentSongIndex = 0;  // Loop back to the first song
@@ -97,7 +139,7 @@ class PlaylistProvider extends ChangeNotifier {
       if (_currentSongIndex! > 0) {
         currentSongIndex = _currentSongIndex! - 1; //
       } else {
-        currentSongIndex = _playlist.length - 1; //If it's the first, play the last song
+        currentSongIndex = _playlist1.length - 1; //If it's the first, play the last song
       }
     }
   }
@@ -123,5 +165,4 @@ class PlaylistProvider extends ChangeNotifier {
 
     });
   }
-
 }

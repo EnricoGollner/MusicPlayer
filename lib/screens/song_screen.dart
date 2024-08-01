@@ -15,7 +15,7 @@ class SongScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<PlaylistProvider>(
       builder: (context, value, child) {
-        final playlist = value.playlist;
+        final playlist = value.playlist1;
         final currentSong = playlist[value.currentSongIndex ?? 0];
 
         return Scaffold(

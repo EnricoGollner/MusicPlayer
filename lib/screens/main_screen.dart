@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:music_player/models/playlist.dart';
 import 'package:music_player/models/playlist_provider.dart';
-import 'package:music_player/models/song.dart';
-import 'package:music_player/screens/song_screen.dart';
+import 'package:music_player/screens/playlist_screen.dart';
 import 'package:music_player/widgets/custom_drawer.dart';
+import 'package:music_player/widgets/custom_playlist_card.dart';
 import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
@@ -21,9 +22,9 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
   }
 
-  void _goToSong(int songIndex) {
-    playlistProvider.currentSongIndex = songIndex;
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const SongScreen()));
+  void _goToPlaylist(Playlist playlist) {
+    playlistProvider.selectPlaylist(playlist);
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const PlaylistScreen()));
   }
 
   @override
@@ -32,26 +33,41 @@ class _MainScreenState extends State<MainScreen> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('P L A Y L I S T'),
+        title: const Text('P L A Y L I S T S'),
+        actions: [
+            IconButton(
+              tooltip: 'Criar Playlist',
+              onPressed: () {
+                showDialog(
+                  barrierDismissible: true,
+                  context: context, builder: (context) {
+                  return Container(
+                    color: Colors.white,
+                    child: const Text('Criar Playlist'),
+                  );
+                });
+              },
+              icon: const Icon(Icons.add),
+            ),
+          ],
       ),
       drawer: const CustomDrawer(),
       body: Consumer<PlaylistProvider>(
         builder: (context, playlistProvider, child) {
-          final List<Song> playlist = playlistProvider.playlist;
+          final List<Playlist> playlists = playlistProvider.playlists;
 
           return ListView.builder(
-            itemCount: playlist.length,
+            itemCount: playlists.length,
             itemBuilder: (context, index) {
-                final Song song = playlist[index];
-                return ListTile(
-                  title: Text(song.songName),
-                  subtitle: Text(song.artistName),
-                  leading: Image.asset(song.albumArtImagePath),
-                  onTap: () => _goToSong(index),
+                final Playlist playlist = playlists[index];
+                return CustomPlaylistCard(
+                  onTap: () => _goToPlaylist(playlist),
+                  cover: playlist.cover!,
+                  title: playlist.title,
                 );
               },
             );
-          },
+        },
       )
     );
   }

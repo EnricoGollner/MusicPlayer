@@ -68,11 +68,11 @@ class _MainScreenState extends State<MainScreen> {
   void _showDialogCreatePlaylist() {
     final TextEditingController ctrlTitle = TextEditingController();
 
-     void _createPlaylist() {
-    playlistProvider.createPlaylist(ctrlTitle.text);
-    ctrlTitle.clear();
-    Navigator.pop(context);
-  }
+    void createPlaylist() {
+      playlistProvider.createPlaylist(ctrlTitle.text);
+      ctrlTitle.clear();
+      Navigator.pop(context);
+    }
 
     showGeneralDialog(
       context: context,
@@ -120,14 +120,17 @@ class _MainScreenState extends State<MainScreen> {
                           textCapitalization: TextCapitalization.words,
                           label: 'Título:', 
                           hintText: 'Informe o título da playlist',
-                          onFieldSubmitted: (_) => _createPlaylist(),
+                          onFieldSubmitted: (_) => createPlaylist(),
                         ),
                         const SizedBox(height: 5),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)
+                            )
                           ),
-                          onPressed: _createPlaylist,
+                          onPressed: createPlaylist,
                           child: Text(
                             'CRIAR',
                             style: TextStyle(color: Theme.of(context).colorScheme.secondary),
@@ -145,23 +148,18 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
- 
-
   Widget _buildPlaylistCover(List<Song> songs) {
     if (songs.isEmpty) return Image.asset('assets/images/song_cover.png', fit: BoxFit.contain);
 
     return songs.length >= 4
-                      ? GridView.builder(
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2),
-                          itemCount: 4,
-                          itemBuilder: (context, index) => Image.asset(
-                            songs[index].albumCoverImagePath,
-                            fit: BoxFit.contain,
-                          ),
-                        )
-                      : Image.asset(songs.first.albumCoverImagePath,
-                          fit: BoxFit.contain);
+      ? GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+          itemCount: 4,
+          itemBuilder: (context, index) => Image.asset(
+            songs[index].albumCoverImagePath,
+            fit: BoxFit.contain,
+          ),
+        )
+      : Image.asset(songs.first.albumCoverImagePath, fit: BoxFit.contain);
   }
 }
